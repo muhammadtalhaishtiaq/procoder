@@ -1,0 +1,4 @@
+.env
+coder.db
+database.db
+__pycache__

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="col-md-12" style="text-align: center; margin-top: 6%;">
+    <h3>Explain what you want the code to do...</h3>
+    <form id="generate-form">
+        <textarea 
+        style="border-radius: 7px; height: 200px;"
+        id="prompt" 
+        placeholder="Enter your code prompt here..."></textarea><br>
+        <button type="submit" class="btn btn-primary" style="border-radius: 7px;">Generate</button>
+    </form>
+</div>
+{% endblock %}

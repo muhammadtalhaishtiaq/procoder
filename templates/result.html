@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="row" style="margin-top: 1%;">
+        <!-- Left Sidebar -->
+        <div class="col-md-3 bg-dark text-light p-3 border-right" style="border-right: 1px solid grey;">
+            <div class="d-flex flex-column h-100">
+                <div class="flex-grow-1 overflow-auto mb-3">
+                    <h5>Chat History</h5>
+                    <div id="chat-history">
+                       
+                    </div>
+                </div>
+                
+                <div class="border-top pt-3">
+                    <form method="POST" action="/update">
+                        <textarea 
+                            class="form-control bg-dark text-light mb-2" 
+                            name="new_prompt" 
+                            rows="3"
+                            placeholder="Enter new instructions to improve the code..."
+                            required
+                        ></textarea>
+                        <input type="hidden" name="current_code" value="">
+                        <button type="submit" class="btn btn-primary btn-block">Update Code</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Code Area -->
+        <div class="col-md-6 bg-dark text-light p-3">
+            <div class="d-flex justify-content-between mb-3">
+                <h5>Generated Code</h5>
+                <div>
+                    <a href="/new_chat" class="btn btn-sm btn-outline-light"><b>+</b> New Chat</a>
+                </div>
+            </div>
+            <pre><code id="code-block" class="language-python"></code></pre>
+        </div>
+
+        <!-- Instructions Panel -->
+        <div class="col-md-3 bg-secondary text-light p-3">
+            <h5>Instructions</h5>
+            <div class="card bg-dark">
+                <div class="card-body">
+                    <pre class="text-light"></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
