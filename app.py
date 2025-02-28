@@ -47,34 +47,84 @@ def init_db():
         ''')
         db.commit()
 
-# Authentication routes
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if request.method == 'POST':
-        email = request.form['email']
-        password = generate_password_hash(request.form['password'])
-        db = get_db()
-        try:
-            db.execute('INSERT INTO users (email, password) VALUES (?, ?)', (email, password))
-            db.commit()
-            return redirect(url_for('login'))
-        except sqlite3.IntegrityError:
-            return "Email already exists!"
-    return render_template('auth/register.html')
 
+#Home
+@app.route('/')
+def home():
+    print('Inside home page')
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    print('sessions obect : ', session['user_id'])
+    # db = get_db()
+    # sessions = db.execute(
+    #     'SELECT * FROM sessions WHERE user_id = ? ORDER BY timestamp DESC',
+    #     (session['user_id'],)
+    # ).fetchall()
+    
+    db = get_db()
+    sessions= db.execute(
+        'SELECT * FROM sessions WHERE user_id = ? AND session_id = ?',
+        (session['user_id'], session['session_id'])
+    ).fetchone()
+    
+    #get all sessions of thi suser
+    all_sessions = db.execute(
+        'SELECT * FROM sessions WHERE user_id = ? ORDER BY timestamp DESC',
+        (session['user_id'],)
+    ).fetchall()
+
+    if(sessions):
+        return render_template('home.html', sessions=sessions, all_sessions=all_sessions)
+    else:
+        return redirect('login')
+    
+# Authentication routes
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        email = request.form['email']
-        password = request.form['password']
-        db = get_db()
-        user = db.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
-        if user and check_password_hash(user['password'], password):
-            session['user_id'] = user['id']
-            return redirect(url_for('home'))
-        return "Invalid credentials"
-    return render_template('auth/login.html')
+    #first we will check if user id and session is already exists
+    current_session = get_current_session()
+    if not current_session:
+        if request.method == 'POST':
+            email = request.form['email']
+            password = request.form['password']
+            
+            #fetch from DB
+            db = get_db()
+            user = db.execute('SELECT * FROM users WHERE email = ?', (email,)).fetchone()
+            print('User: ', user)
+            if user and check_password_hash(user['password'], password):
+                print('User found!')
+                session['user_id'] = user['id']
+                #create new session in DB
+                session_id = str(uuid.uuid4())
+                db.execute('INSERT INTO sessions (session_id, user_id) VALUES (?, ?)', (session_id, user['id']))
+                db.commit()
+                session['session_id'] = session_id
+                #we will go to / route, on home screen
+                return redirect(url_for('home'))
+            return render_template('auth/login.html', error='Invalid email or password')
+        return render_template('auth/login.html')
+    return redirect(url_for('home'))
 
+
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    current_session = get_current_session()
+    if not current_session:
+        if request.method == 'POST':
+            email = request.form['email']
+            name = request.form['user_name']
+            password = generate_password_hash(request.form['password'])
+            db = get_db()
+            try:
+                db.execute('INSERT INTO users (name, email, password) VALUES (?, ?, ?)', (name, email, password))
+                db.commit()
+                return redirect(url_for('login'))
+            except sqlite3.IntegrityError:
+                return render_template('auth/register.html', error='Email already exists!')
+        return render_template('auth/register.html')
+    return redirect(url_for('home'))
 @app.route('/logout')
 def logout():
     session.clear()
@@ -82,7 +132,7 @@ def logout():
 
 # Session management
 def get_current_session():
-    session_id = str(uuid.uuid4())
+    session_id = session.get('session_id')
     user_id = session.get('user_id')
     print('user_id: ', user_id)
     print('session_id: ', session_id)
@@ -96,18 +146,7 @@ def get_current_session():
     ).fetchone()
 
 # Main routes
-@app.route('/')
-def home():
-    # if 'user_id' not in session:
-    #     return redirect(url_for('login'))
-    
-    # db = get_db()
-    # sessions = db.execute(
-    #     'SELECT * FROM sessions WHERE user_id = ? ORDER BY timestamp DESC',
-    #     (session['user_id'],)
-    # ).fetchall()
-    
-    return render_template('home.html')
+
 
 @app.route('/new_chat')
 def new_chat():
@@ -162,18 +201,17 @@ def generate_code():
     full_text = response.json()['output']['text']
     code = full_text.split("CODE:")[1].split("INSTRUCTIONS:")[0].strip()
     instructions = full_text.split("INSTRUCTIONS:")[1].strip()
-        
-    # db = get_db()
-    # db.execute(
-    #         'UPDATE sessions current_code = ?, instructions = ? WHERE session_id = ?',
-    #         (code, instructions, session['session_id']) )
-    # db.commit()
+    print("session['session_id']: ", session['session_id'])
+    db = get_db()
+    db.execute('UPDATE sessions SET current_code = ?, instructions = ? WHERE session_id = ?',
+        (code, instructions, session['session_id']))
+    db.commit()
 
-    # if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-    #     return jsonify({
-    #             'code': code,
-    #             'instructions': instructions
-    #     })
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        return jsonify({
+                'code': code,
+                'instructions': instructions
+        })
             
     # return redirect(url_for('result'),prompt=prompt, code=code, instructions=instructions)
     return jsonify({'code': code, 'instructions': instructions, 'prompt': prompt})
@@ -198,15 +236,16 @@ def get_sessions():
 
 @app.route('/result')
 def result():
-    # current_session = get_current_session()
-    # print('current_session: ', current_session)
-    # if not current_session:
-    #     return redirect(url_for('home'))
-    return render_template('result.html')
-    # return render_template('result.html',
-    #     code=current_session['current_code'],
-    #     instructions=current_session['instructions'],
-    # )
+    current_session = get_current_session()
+    print('current_session: ', current_session)
+    if not current_session:
+        return redirect(url_for('home'))
+    # return render_template('result.html')
+    return render_template('result.html',
+        code=current_session['current_code'],
+        instructions=current_session['instructions'],
+        sessions=current_session
+    )
 
 if __name__ == '__main__':
     init_db()

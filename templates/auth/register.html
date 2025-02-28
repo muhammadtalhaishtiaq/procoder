@@ -4,10 +4,15 @@
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card dark-card">
-                <div class="card-header">Register</div>
+            <div class="card dark-card" style="text-align: center;">
+                <div class="card-header" style="color: black;">Register</div>
                 <div class="card-body">
+                    {% if error %}<p class="text-danger">{{ error }}</p>{% endif %}
                     <form method="POST" action="/register">
+                        <div class="mb-3">
+                            <input type="text" name="user_name" class="form-control dark-input" 
+                                   placeholder="Name" required>
+                        </div>
                         <div class="mb-3">
                             <input type="email" name="email" class="form-control dark-input" 
                                    placeholder="Email" required>
@@ -17,7 +22,7 @@
                                    placeholder="Password (min 4 characters)" required minlength="4">
                         </div>
                         <button type="submit" class="btn btn-primary">Register</button>
-                        <a href="/login" class="btn btn-link text-light">Already have an account? Login</a>
+                        <a href="/login" class="btn btn-link text-dark">Already have an account? Login</a>
                     </form>
                 </div>
             </div>

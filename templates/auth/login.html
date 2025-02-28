@@ -4,9 +4,10 @@
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card dark-card">
-                <div class="card-header">Login</div>
+            <div class="card dark-card" style="text-align: center;">
+                <div class="card-header" style="color: black;">Login</div>
                 <div class="card-body">
+                    {% if error %}<p class="text-danger">{{ error }}</p>{% endif %}
                     <form method="POST">
                         <div class="mb-3">
                             <input type="email" name="email" class="form-control dark-input" placeholder="Email" required>

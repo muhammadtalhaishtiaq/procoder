@@ -1,13 +1,32 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="col-md-12" style="text-align: center; margin-top: 6%;">
-    <h3>Explain what you want the code to do...</h3>
-    <form id="generate-form">
-        <textarea 
-        style="border-radius: 7px; height: 200px;"
-        id="prompt" 
-        placeholder="Enter your code prompt here..."></textarea><br>
-        <button type="submit" class="btn btn-primary" style="border-radius: 7px;">Generate</button>
-    </form>
+<div class="row">
+    <div class="col-md-8 mx-auto" style="text-align: center; margin-top: 2%;">
+        <div class="row">
+            <h3>Explain what you want the code to do...</h3>
+            <textarea style="border-radius: 7px; height: 200px;" id="prompt" name="prompt"
+                placeholder="Enter your code prompt here..."></textarea><br>
+            <button type="button" class="btn btn-primary" id="generate-form"
+                style="border-radius: 7px;">Generate</button>
+        </div>
+    </div>
 </div>
+
+
+<div class="row">
+    <div class="col-md-8 mx-auto" style=" margin-top: 2%;">
+        <h3>Previous Chats</h3>
+        <div class="card" style="height: 50%;overflow-y: auto; background-color: black;">
+            <ul class="list-group list-group-flush">
+                {% for session in all_sessions %}
+                <li class="list-group-item" style="background: #696969;color: white;"
+                    id="open_session_{{session['session_id']}}">{{session['session_id']}}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
+
+<script>
