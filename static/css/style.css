@@ -6,17 +6,25 @@ body {
     font-family: Arial, sans-serif;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
     color: #e0e0e0;
 }
+
 .container {
     max-width: 100% !important;
     /* margin: 0 auto; */
     /* padding: 20px; */
 }
-button{
+
+button {
     border: 1px;
 }
+
 .card {
     background-color: #252525;
     border-radius: 8px;
@@ -45,4 +53,11 @@ button {
 
 button:hover {
     background-color: #0056b3;
+}
+
+.instructions_button:hover {
+    background-image: linear-gradient(to right top, #a88097, #a27b9c, #9877a2, #8a74a9, #7673b0, #6178b6,
+            #477db8, #2181b8, #008ab3, #0691ab, #2d97a1, #499c97);
+    color: white;
+    border: none;
 }

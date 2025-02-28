@@ -265,6 +265,18 @@ def result():
     )
     
     
+def convert_to_bold(text):
+    """
+    This function takes a string and replaces '**' before and after a word with HTML bold tags '<b>' and '</b>'.
+    
+    :param text: str, input string containing '**' around the text to be converted to bold
+    :return: str, modified string with bold HTML tags
+    """
+    # Replace '**' at the start and end with '<b>' and '</b>'
+    if text.startswith('**') and text.endswith('**'):
+        return f"<b>{text[2:-2]}</b>"
+    else:
+        return text
 @app.route('/generated_results/<session_id>')
 def get_generated_results( session_id ):
     
@@ -280,7 +292,7 @@ def get_generated_results( session_id ):
     # # return render_template('result.html')
     return render_template('result.html',
         code=clean_code_response(chat_session['current_code']),
-        instructions=chat_session['instructions'],
+        instructions=convert_to_bold(chat_session['instructions']),
         sessions=current_session
     )
 

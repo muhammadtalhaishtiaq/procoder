@@ -1,9 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
+    <style>
+      
+    </style>
+
     <div class="row" style="margin-top: 1%;">
         <!-- Left Sidebar -->
-        <div class="col-md-3 bg-dark text-light p-3 border-right" style="border-right: 1px solid grey;">
+        <div class="col-md-3 bg-dark text-light p-3 border-right sticky">
             <div class="d-flex flex-column h-100">
                 <div class="flex-grow-1 overflow-auto mb-3">
                     <h5>Chat History</h5>
@@ -29,24 +33,40 @@
         </div>
 
         <!-- Main Code Area -->
-        <div class="col-md-6 bg-dark text-light p-3">
+        <div class="col-md-9 bg-dark text-light p-3 sticky">
             <div class="d-flex justify-content-between mb-3">
                 <h5>Generated Code</h5>
                 <div>
                     <a href="/new_chat" class="btn btn-sm btn-outline-light"><b>+</b> New Chat</a>
+                    <a href="javascript:void" class="btn btn-sm btn-outline-light instructions_button"
+                    type="button" class="btn btn-sm btn-primary"
+                    data-bs-toggle="modal" data-bs-target="#code_instructions"
+                    > Instructions</a>
                 </div>
             </div>
             <pre><code class="hljs" id="code-block">{{code}}</code></pre>
         </div>
-
+        <div class="modal fade" id="code_instructions" tabindex="-1" aria-labelledby="code_instructionsLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="code_instructionsLabel" style="color: black !important;">Instructions to Run Code</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <pre>{{instructions}}</pre> 
+                    </div>
+                </div>
+            </div>
+        </div>
         <!-- Instructions Panel -->
-        <div class="col-md-3 bg-secondary text-light p-3">
+        <!-- <div class="col-md-3 bg-secondary text-light p-3 sticky">
             <h5>Instructions</h5>
             <div class="card bg-dark">
                 <div class="card-body">
                     <pre class="text-light">{{instructions}}</pre>
                 </div>
             </div>
-        </div>
+        </div> -->
     </div>
 {% endblock %}
