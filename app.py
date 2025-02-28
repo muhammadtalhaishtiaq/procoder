@@ -70,7 +70,7 @@ def home():
     
     #get all sessions of thi suser
     all_sessions = db.execute(
-        'SELECT * FROM sessions WHERE user_id = ? ORDER BY timestamp DESC',
+        'SELECT * FROM sessions WHERE user_id = ? and current_code is not null ORDER BY timestamp DESC',
         (session['user_id'],)
     ).fetchall()
 
@@ -131,9 +131,9 @@ def logout():
     return redirect(url_for('home'))
 
 # Session management
-def get_current_session():
-    session_id = session.get('session_id')
-    user_id = session.get('user_id')
+def get_current_session(session_id= None, user_id= None):
+    session_id = (session.get('session_id') or session_id)
+    user_id = (session.get('user_id') or user_id)
     print('user_id: ', user_id)
     print('session_id: ', session_id)
 
@@ -209,7 +209,7 @@ def generate_code():
 
     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
         return jsonify({
-                'code': code,
+                'code': clean_code_response(code),
                 'instructions': instructions
         })
             
@@ -220,6 +220,23 @@ def generate_code():
     #     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
     #         return jsonify({'error': str(e)}), 500
     #     raise e
+
+def clean_code_response(response: str) -> str:
+    """
+    Removes the first line (```language) and last line (```) 
+    from a code block response.
+    """
+    lines = response.strip().split('\n')
+    
+    # Remove first line if it starts with ```
+    if lines and lines[0].strip().startswith('```'):
+        lines = lines[1:]
+        
+    # Remove last line if it's just ```
+    if lines and lines[-1].strip() == '```':
+        lines = lines[:-1]
+        
+    return '\n'.join(lines).strip()
 
 @app.route('/sessions')
 def get_sessions():
@@ -244,6 +261,26 @@ def result():
     return render_template('result.html',
         code=current_session['current_code'],
         instructions=current_session['instructions'],
+        sessions=current_session
+    )
+    
+    
+@app.route('/generated_results/<session_id>')
+def get_generated_results( session_id ):
+    
+    db = get_db()
+    chat_session=  db.execute(
+            'SELECT * FROM sessions WHERE session_id = "'+ session_id+'" and current_code is not null',
+        ).fetchone()
+    print('current_chat_session: ', chat_session)
+    current_session = get_current_session()
+    # print('current_session: ', current_session)
+    if not current_session:
+        return redirect(url_for('home'))
+    # # return render_template('result.html')
+    return render_template('result.html',
+        code=clean_code_response(chat_session['current_code']),
+        instructions=chat_session['instructions'],
         sessions=current_session
     )
 

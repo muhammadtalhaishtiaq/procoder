@@ -1,29 +1,76 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="row">
-    <div class="col-md-8 mx-auto" style="text-align: center; margin-top: 2%;">
-        <div class="row">
-            <h3>Explain what you want the code to do...</h3>
-            <textarea style="border-radius: 7px; height: 200px;" id="prompt" name="prompt"
-                placeholder="Enter your code prompt here..."></textarea><br>
-            <button type="button" class="btn btn-primary" id="generate-form"
-                style="border-radius: 7px;">Generate</button>
+<div class="row" style="text-align: center;margin-top: 2%;">
+    <h5>What you want to build!</h5>
+    <div class="col-md-8 mx-auto" style="    padding: 1%;
+    border: 1px solid grey;
+    border-radius: 4px;">
+        <div class="row" style="margin-bottom: 2%;">
+            <div class="col">
+                <select class="form-select" placeholder="LLM Models" style="background: #000000;
+                color: white;
+                border: 0.5px solid grey;">
+                    <optgroup label="Google">
+                        <option value="vertex">Vertex AI</option>
+                    </optgroup>
+                    <optgroup label="Open AI">
+                        <option value="open_ai_base">Base</option>
+                        <option value="open_ai_o1">O1</option>
+                    </optgroup>
+                    <optgroup label="DeepSeek">
+                        <option value="deepseek_base">Base</option>
+                        <option value="deepseek_r1">R1</option>
+                    </optgroup>
+                    <optgroup label="Qwen">
+                        <option value="qwen_max">Qwen Max</option>
+                        <option value="qwen_plus">Qwen Plus</option>
+                    </optgroup>
+                </select>
+            </div>
+            <div class="col">
+                <input type="text" class="form-control" id="api_Secret" placeholder="API Secret" style="background: #000000;
+                    color: white;
+                    border: 0.5px solid grey;">
+            </div>
         </div>
+        <!-- </div> -->
+
+        <!-- <div class="col-md-8 mx-auto" style="text-align: center;"> -->
+        <textarea style="border-radius: 7px; height: 150px; background: #000000;
+        color: white;
+        border: 0.5px solid grey;" id="prompt" name="prompt"
+            placeholder="Enter your code prompt here..."></textarea><br>
+        <button type="button" class="btn btn-primary" id="generate-form" style="border-radius: 7px; border-radius:
+            7px; background-image: linear-gradient(to right top, #a88097, #a27b9c, #9877a2, #8a74a9, #7673b0, #6178b6,
+            #477db8, #2181b8, #008ab3, #0691ab, #2d97a1, #499c97);">Generate</button>
     </div>
 </div>
 
 
 <div class="row">
-    <div class="col-md-8 mx-auto" style=" margin-top: 2%;">
+    <div class="col-md-8 mx-auto" style=" margin-top: 2%; ">
         <h3>Previous Chats</h3>
-        <div class="card" style="height: 50%;overflow-y: auto; background-color: black;">
-            <ul class="list-group list-group-flush">
+        <table class="table table-inverse" style="color: white;">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Session ID</th>
+                    <th scope="col">Timestamp</th>
+                </tr>
+            </thead>
+            <tbody>
                 {% for session in all_sessions %}
-                <li class="list-group-item" style="background: #696969;color: white;"
-                    id="open_session_{{session['session_id']}}">{{session['session_id']}}</li>
+                <tr>
+                    <td>{{ session['id']}}</td>
+                    <td>{{ session['session_id'] }}</td>
+                    <td><a href="/generated_results/{{ session['session_id'] }}" class="btn btn-primary"
+                            style="border: none; background-image: linear-gradient(to right top, #d16ba5, #da6aa4, #e36aa2, #ec69a0, #f4699d, #f86b99, #fc6d94, #ff6f90, #ff748a, #ff7985, #ff7f81, #ff847d);">Open
+                            Chat</a></td>
+                </tr>
                 {% endfor %}
-            </ul>
-        </div>
+            </tbody>
+        </table>
+
     </div>
 </div>
 

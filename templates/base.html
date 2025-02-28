@@ -11,6 +11,10 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"></script>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <!-- and it's easy to individually load additional languages -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
 
 </head>
 
@@ -18,7 +22,7 @@
     <!-- Navigation bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">ProCode</a>
+            <a class="navbar-brand" href="/">ProCode</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -26,12 +30,19 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     {% if sessions %}
-                        <li class="nav-item">
+                    <!-- <li class="nav-item">
                             <a class="nav-link" href="#">Session ID: {{ sessions['session_id'] }}</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#">User ID: {{ sessions['user_id'] }}</a>
-                        </li>
+                        </li> -->
+                    <li class="nav-item"></li>
+                    <button style="background-image: linear-gradient(to right top, #a88097, #a27b9c, #9877a2, #8a74a9, #7673b0, #6178b6,
+            #477db8, #2181b8, #008ab3, #0691ab, #2d97a1, #499c97);" type="button" class="btn btn-sm btn-primary"
+                        data-bs-toggle="modal" data-bs-target="#userSession">
+                        Current User
+                    </button>
+                    </li>
                     {% endif %}
                     <li class="nav-item">
                         <a class="nav-link" href="/">Home</a>
@@ -49,19 +60,28 @@
             </div>
         </div>
     </nav>
-
+    <!-- Modal -->
+    <div class="modal fade" id="userSession" tabindex="-1" aria-labelledby="userSessionLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userSessionLabel">Session Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><b>Session ID:</b> {{ sessions['session_id'] }}</p>
+                    <p><b>User ID: </b>{{ sessions['user_id'] }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="container">
         {% block content %}{% endblock %}
     </div>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
-
-    <!-- and it's easy to individually load additional languages -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/go.min.js"></script>
-
-    <script>hljs.highlightAll();</script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="/static/js/script.js"></script>
-    <script src="/static/js/prism.js"></script>
+    <script>hljs.highlightAll();</script>
+
 </body>
 
 </html>

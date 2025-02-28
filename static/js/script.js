@@ -2,6 +2,10 @@ $('#generate-form').on('click', function(e) {
     e.preventDefault();
     const prompt = $('#prompt').val();
     console.log('Prompt:', prompt);
+    if(prompt === '') {
+        alert('Please enter a prompt.');
+        return;
+    }
     fetch('/generate', {
         method: 'POST',
         headers: {

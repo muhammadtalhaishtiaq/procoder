@@ -1,17 +1,22 @@
 body {
     background-color: #1a1a1a;
     background: black !important;
-    color: white !important;
+    /* color: white !important; */
     /* color: #e0e0e0; */
     font-family: Arial, sans-serif;
 }
 
+h1, h2, h3, h4, h5, h6 {
+    color: #e0e0e0;
+}
 .container {
     max-width: 100% !important;
     /* margin: 0 auto; */
     /* padding: 20px; */
 }
-
+button{
+    border: 1px;
+}
 .card {
     background-color: #252525;
     border-radius: 8px;
