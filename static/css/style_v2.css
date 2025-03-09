@@ -1,0 +1,139 @@
+/* Global Styles */
+
+body {
+    background-color: #0a0a0a;
+    color: #f8f9fa;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}
+
+
+/* Logo */
+
+.bolt-logo {
+    fill: white;
+}
+
+
+/* Main Content */
+
+.main-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+
+/* Search Box */
+
+.search-container {
+    max-width: 600px;
+}
+
+.search-box {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.search-box .form-control {
+    background-color: #1a1a1a !important;
+    border: 1px solid #333 !important;
+    color: white !important;
+    padding: 12px 16px;
+    font-size: 16px;
+}
+
+.search-box .input-group-text {
+    background-color: #1a1a1a !important;
+    border: 1px solid #333 !important;
+    color: #6c757d;
+}
+
+
+/* Quick Start Options */
+
+.quick-start-options .btn {
+    border-radius: 6px;
+    padding: 8px 16px;
+    margin: 4px;
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+    color: #f8f9fa;
+    transition: all 0.2s ease;
+}
+
+.quick-start-options .btn:hover {
+    background-color: #252525;
+    border-color: #444;
+}
+
+
+/* Tech Icons */
+
+.tech-icon {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    background-color: #1a1a1a;
+    border: 1px solid #333;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.tech-icon:hover {
+    background-color: #252525;
+    border-color: #444;
+}
+
+.tech-icon svg {
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+.tech-icon:hover svg {
+    opacity: 1;
+}
+
+
+/* Footer */
+
+.footer {
+    border-top: 1px solid #333;
+    padding-top: 20px;
+    margin-top: 100px;
+}
+
+.footer a {
+    color: #6c757d;
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.2s ease;
+}
+
+.footer a:hover {
+    color: #f8f9fa;
+}
+
+
+/* Dark Mode Toggle */
+
+.dark-mode-toggle {
+    cursor: pointer;
+}
+
+
+/* Responsive Adjustments */
+
+@media (max-width: 768px) {
+    .quick-start-options {
+        flex-direction: column;
+    }
+    .tech-icons {
+        gap: 10px;
+    }
+    .tech-icon {
+        width: 50px;
+        height: 50px;
+    }
+}

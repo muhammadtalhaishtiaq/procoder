@@ -1,25 +1,69 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
 
-{% block content %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card dark-card" style="text-align: center;">
-                <div class="card-header" style="color: black;">Login</div>
-                <div class="card-body">
-                    {% if error %}<p class="text-danger">{{ error }}</p>{% endif %}
-                    <form method="POST">
-                        <div class="mb-3">
-                            <input type="email" name="email" class="form-control dark-input" placeholder="Email" required>
+
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Procider - Build web and mobile apps</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Custom CSS -->
+    <!-- <link href="styles.css" rel="stylesheet"> -->
+    <link rel="stylesheet" href="/static/css/style_v2.css">
+</head>
+
+<body class="bg-dark text-white">
+    <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg navbar-dark py-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/">
+                    <img src="https://sjc.microlink.io/yhsYPwQJU_SvsoaCaja_cYKPPQSw_xX23oMjAMEdkLcLU0zKcY8cMvYwcdBo1JJZshFVQzyoyHFJ3k5jgIsnPA.jpeg" alt="ProCoder" width="80" class="d-none">
+                    <svg width="40" height="24" viewBox="0 0 40 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="ProCoder-logo">
+                        <path d="M26.5 0L13 13.5H22L13.5 24L27 10.5H18L26.5 0Z" fill="white"/>
+                    </svg>
+                    <span class="ms-2 fw-bold">ProCoder</span>
+                </a>
+                <div class="d-flex align-items-center">
+                    <span class="badge bg-dark text-white border border-secondary me-3">We're hiring!</span>
+                    <a href="/login" class="btn btn-dark me-2">Sign In</a>
+                    <a href="/register" class="btn btn-primary">Get Started</a>
+                </div>
+            </div>
+        </nav>
+        <div class="container mt-5">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card dark-card" style="text-align: center;">
+                        <div class="card-header" style="color: black;">Login</div>
+                        <div class="card-body">
+                            {% if error %}
+                            <p class="text-danger">{{ error }}</p>{% endif %}
+                            <form method="POST">
+                                <div class="mb-3">
+                                    <input type="email" name="email" class="form-control dark-input" placeholder="Email" required>
+                                </div>
+                                <div class="mb-3">
+                                    <input type="password" name="password" class="form-control dark-input" placeholder="Password" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Login</button>
+                            </form>
                         </div>
-                        <div class="mb-3">
-                            <input type="password" name="password" class="form-control dark-input" placeholder="Password" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Login</button>
-                    </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
-{% endblock %}
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script src="/static/js/script_v2.js"></script>
+
+</body>
+
+</html>
