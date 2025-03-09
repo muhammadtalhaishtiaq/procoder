@@ -403,7 +403,19 @@ def generate_code():
     
     data = final_response.json()  # Convert response to JSON
     project_details = json.loads(data['output']['text'].strip('```json\n'))
-    print('project_details: ', project_details)
+    
+    project_name = project_details.get('project_name')
+    description = project_details.get('description')
+    tech_stack = project_details.get('tech_stack')
+    files = project_details.get('files')
+    instructions = project_details.get('instructions')
+    
+    
+    print('project_name: ', project_name)
+    print('description: ', description)
+    print('tech_stack: ', tech_stack)
+    print('files: ', files)
+    print('instructions: ', instructions)
 
 
     
