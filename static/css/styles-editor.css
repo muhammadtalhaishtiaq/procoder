@@ -1,0 +1,231 @@
+/* Global Styles */
+
+body {
+    background-color: #0a0a0a;
+    min-height: 100vh;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.bg-darker {
+    background-color: #1a1a1a;
+}
+
+
+/* Navigation */
+
+.navbar {
+    border-bottom: 1px solid #333;
+    padding: 0.5rem 1rem;
+}
+
+.bolt-logo {
+    fill: white;
+}
+
+
+/* Sidebar */
+
+.sidebar {
+    width: 300px;
+    border-right: 1px solid #333;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 60px);
+}
+
+.chat-header {
+    border-bottom: 1px solid #333;
+}
+
+.chat-messages {
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+.chat-input {
+    border-top: 1px solid #333;
+}
+
+
+/* Task List */
+
+.task-list {
+    margin-top: 1rem;
+}
+
+.task {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    color: #6c757d;
+}
+
+.task i {
+    margin-right: 0.5rem;
+    font-size: 18px;
+}
+
+.task.completed {
+    color: #28a745;
+}
+
+.task.in-progress {
+    color: #007bff;
+}
+
+
+/* File Explorer */
+
+.file-explorer {
+    width: 250px;
+    border-right: 1px solid #333;
+}
+
+.file-item {
+    display: flex;
+    align-items: center;
+    padding: 0.25rem 0;
+    color: #6c757d;
+    cursor: pointer;
+}
+
+.file-item i {
+    margin-right: 0.5rem;
+    font-size: 18px;
+}
+
+.file-item:hover {
+    color: #f8f9fa;
+}
+
+.file-item.active {
+    color: #f8f9fa;
+}
+
+
+/* Code Editor */
+
+.editor-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.editor-tabs {
+    border-bottom: 1px solid #333;
+    padding: 0.5rem;
+}
+
+.tab {
+    display: flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    color: #6c757d;
+    border-right: 1px solid #333;
+    cursor: pointer;
+}
+
+.tab.active {
+    color: #f8f9fa;
+    background-color: #252525;
+}
+
+.tab i {
+    margin-left: 0.5rem;
+    font-size: 16px;
+}
+
+.editor-content {
+    flex-grow: 1;
+    background-color: #1a1a1a;
+    overflow-y: auto;
+}
+
+.editor-content pre {
+    margin: 0;
+    tab-size: 4;
+}
+
+
+/* Terminal */
+
+.terminal {
+    height: 200px;
+    border-top: 1px solid #333;
+}
+
+.terminal-content {
+    height: calc(100% - 40px);
+    overflow-y: auto;
+    font-family: "Courier New", Courier, monospace;
+}
+
+.command-line {
+    margin-bottom: 0.5rem;
+}
+
+.command-line span {
+    margin-right: 0.5rem;
+}
+
+
+/* Scrollbar Styling */
+
+ ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+ ::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+ ::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 4px;
+}
+
+ ::-webkit-scrollbar-thumb:hover {
+    background: #444;
+}
+
+
+/* Form Controls */
+
+.form-control {
+    background-color: #252525 !important;
+    border: 1px solid #333 !important;
+    color: white !important;
+}
+
+.form-control:focus {
+    box-shadow: none !important;
+    border-color: #007bff !important;
+}
+
+
+/* Buttons */
+
+.btn-dark {
+    background-color: #252525;
+    border: 1px solid #333;
+}
+
+.btn-dark:hover {
+    background-color: #333;
+    border-color: #444;
+}
+
+
+/* Dropdown */
+
+.dropdown-menu {
+    background-color: #252525;
+    border: 1px solid #333;
+}
+
+.dropdown-item:hover {
+    background-color: #333;
+}

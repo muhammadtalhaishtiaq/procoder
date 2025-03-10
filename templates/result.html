@@ -1,63 +1,240 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
 
-{% block content %}
-    <style>
-      
-    </style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Editor - ProCoder</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Material Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="/static/css/styles-editor.css" rel="stylesheet">
+</head>
 
-    <div class="row" style="margin-top: 1%;">
+<body class="bg-dark">
+    <!-- Top Navigation -->
+    <nav class="navbar navbar-dark bg-darker">
+        <div class="container-fluid">
+            <div class="d-flex align-items-center">
+                <a class="navbar-brand" href="/">
+                    <svg width="40" height="24" viewBox="0 0 40 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="proCoder-logo">
+                        <path d="M26.5 0L13 13.5H22L13.5 24L27 10.5H18L26.5 0Z" fill="white"/>
+                    </svg>
+                    <span class="ms-2 fw-bold">proCoder</span>
+                </a>
+                <div class="dropdown ms-4">
+                    <button class="btn btn-dark dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown">
+                        <span>Project</span>
+                        <!-- <i class="material-icons ms-2">arrow_drop_down</i> -->
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark">
+                        <li><a class="dropdown-item" href="#">New Project</a></li>
+                        <li><a class="dropdown-item" href="#">Open Project</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="d-flex align-items-center">
+                <!-- <button class="btn btn-dark me-2">
+                    <i class="material-icons">file_download</i>
+                    Export
+                </button>
+                <button class="btn btn-dark me-2">
+                    <i class="material-icons">proCoder</i>
+                    Connect to Supabase
+                </button>
+                <button class="btn btn-primary">
+                    <i class="material-icons">rocket_launch</i>
+                    Deploy
+                </button> -->
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="d-flex h-100">
         <!-- Left Sidebar -->
-        <div class="col-md-3 bg-dark text-light p-3 border-right sticky">
-            <div class="d-flex flex-column h-100">
-                <div class="flex-grow-1 overflow-auto mb-3">
-                    <h5>Chat History</h5>
-                    <div id="chat-history">
-                       
+        <div class="sidebar bg-darker">
+            <div class="chat-header p-3">
+                <div class="d-flex align-items-center">
+                    <!-- <img src="/placeholder.svg?height=40&width=40" class="rounded-circle me-2" alt="User Avatar"> -->
+                    <div class="flex-grow-1">
+                        <p class="mb-0 text-white" style="text-align: center;font-weight: 600;">{{current_chat.title}}</p>
+                        <!-- <small class="text-secondary">Using Bootstrap and plain JavaScript</small> -->
                     </div>
                 </div>
-                
-                <div class="border-top pt-3">
-                    <form method="POST" action="/update">
-                        <textarea 
-                            class="form-control bg-dark text-light mb-2" 
-                            name="new_prompt" 
-                            rows="3"
-                            placeholder="Enter new instructions to improve the code..."
-                            required
-                        ></textarea>
-                        <input type="hidden" name="current_code" value="">
-                        <button type="submit" class="btn btn-primary btn-block">Update Code</button>
-                    </form>
+            </div>
+            <div class="chat-messages p-3">
+                <!-- <div class="message">
+                    <p class="text-white mb-2">I'll help you create a complete UI for ProCoder using plain HTML, Bootstrap, and JavaScript.</p>
+                </div>
+                <div class="task-list">
+                    <div class="task completed">
+                        <i class="material-icons text-success">check_circle</i>
+                        <span>Create initial files</span>
+                    </div>
+                    <div class="task completed">
+                        <i class="material-icons text-success">check_circle</i>
+                        <span>Update package.json</span>
+                    </div>
+                    <div class="task in-progress">
+                        <i class="material-icons text-primary">refresh</i>
+                        <span>Install dependencies</span>
+                    </div>
+                </div> -->
+                {% for chat_message in chat_messages %}
+                <div class="message" data-sender="{{chat_message.sender}}">
+                    {% if chat_message.sender == 'user' %}
+                    <div class="message-content user-message">
+                        <p class="text-white mb-0" style="font-size: 12px;">{{chat_message.content}}</p>
+                    </div>
+                    {% else %}
+                    <div class="message-content assistant-message">
+                        <p class="text-white mb-0" style="font-size: 12px;">{{chat_message.content}}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            <div class="chat-input p-3">
+                <div class="input-group">
+                    <input type="text" class="form-control bg-dark text-white" placeholder="How can proCoder help you today?">
+                    <button class="btn btn-dark">
+                        <i class="material-icons">send</i>
+                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- Main Code Area -->
-        <div class="col-md-9 bg-dark text-light p-3 sticky">
-            <div class="d-flex justify-content-between mb-3">
-                <h5>Generated Code</h5>
-                <div>
-                    <a href="/new_chat" class="btn btn-sm btn-outline-light"><b>+</b> New Chat</a>
-                    <a href="javascript:void" class="btn btn-sm btn-outline-light instructions_button"
-                    type="button" class="btn btn-sm btn-primary"
-                    data-bs-toggle="modal" data-bs-target="#code_instructions"
-                    > Instructions</a>
+        <!-- Main Editor Area -->
+        <div class="editor-container flex-grow-1">
+            <div class="d-flex h-100">
+                <!-- File Explorer -->
+                <div class="file-explorer bg-darker">
+                    <div class="p-3">
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="material-icons text-secondary me-2">folder</i>
+                            <span class="text-white">Structure</span>
+                        </div>
+                        <div class="file-tree">
+                            <div class="file-item">
+                                <i class="material-icons text-secondary">description</i>
+                                <span>index.html</span>
+                            </div>
+                            <div class="file-item">
+                                <i class="material-icons text-secondary">css</i>
+                                <span>styles.css</span>
+                            </div>
+                            <div class="file-item">
+                                <i class="material-icons text-secondary">javascript</i>
+                                <span>script.js</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Code Editor -->
+                <div class="code-editor flex-grow-1" style="background-color: #1a1a1a;">
+                    <div class="editor-tabs d-flex bg-darker">
+                        <div class="tab active">
+                            <span>styles.css</span>
+                            <i class="material-icons">close</i>
+                        </div>
+                    </div>
+                    <div class="editor-content">
+                        <pre class="text-white p-3">
+<code>/* Global Styles */
+body {
+    background-color: #0a0a0a;
+    color: #f8f9fa;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Add your styles here */</code>
+                        </pre>
+                    </div>
                 </div>
             </div>
-            <pre><code class="hljs" id="code-block">{{code}}</code></pre>
-        </div>
-        <div class="modal fade" id="code_instructions" tabindex="-1" aria-labelledby="code_instructionsLabel" aria-hidden="true">
-            <div class="modal-dialog modal-xl">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="code_instructionsLabel" style="color: black !important;">Instructions to Run Code</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+            <!-- Terminal -->
+            <div class="terminal bg-darker">
+                <div class="terminal-header d-flex align-items-center p-2">
+                    <i class="material-icons text-secondary me-2">terminal</i>
+                    <span class="text-white">Terminal</span>
+                </div>
+                <div class="terminal-content p-3">
+                    <div class="command-line">
+                        <span class="text-success">$</span>
+                        <span class="text-white">npm install</span>
                     </div>
-                    <div class="modal-body">
-                        <pre>{{instructions}}</pre> 
+                    <div class="command-output text-secondary">
+                        Installing dependencies...
                     </div>
                 </div>
             </div>
         </div>
     </div>
-{% endblock %}
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JavaScript -->
+    <script src="/static/js/script-editor.js"></script>
+
+    <style>
+        .message {
+            display: flex;
+            margin-bottom: 1rem;
+            width: 100%;
+        }
+        
+        .message[data-sender="user"] {
+            justify-content: flex-end;
+        }
+        
+        .message[data-sender="assistant"] {
+            justify-content: flex-start;
+        }
+        
+        .message-content {
+            max-width: 70%;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            word-wrap: break-word;
+        }
+        
+        .user-message {
+            background-color: #2563eb;
+            margin-left: auto;
+            border-bottom-right-radius: 0.25rem;
+        }
+        
+        .assistant-message {
+            background-color: #374151;
+            margin-right: auto;
+            border-bottom-left-radius: 0.25rem;
+        }
+        
+        .chat-messages {
+            overflow-y: auto;
+            max-height: calc(100vh - 200px);
+            padding: 1rem;
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const messages = document.querySelectorAll('.message');
+            messages.forEach(message => {
+                const sender = message.getAttribute('data-sender');
+                if (sender === 'user') {
+                    message.classList.add('user-message-container');
+                } else {
+                    message.classList.add('assistant-message-container');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

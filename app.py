@@ -6,6 +6,7 @@ import requests
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
 import json
+from datetime import datetime
 load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
@@ -206,26 +207,37 @@ def generate_code():
             session['user_prompt'] = request.json.get('prompt')
         return jsonify({'error': 'unauthorized'}), 401
     
-    # try:
-    #get prompt from session if exists other wise get from request
-    # prompt = session.get('user_prompt')
-    # if not prompt:
+    # Optimized Schema Strategy for bolt.new
+    # 1. User Registration & Authentication
+    # Users sign up/log in, creating an entry in the users table.
+    # Their id is used for chat session tracking.
+    # 2. Creating a New Chat Session
+    # When a user starts a chat, a record is inserted into chats.
+    # The chat is assigned a chat_id and marked as active.
+    # 3. Storing User Messages
+    # Every user input (e.g., prompts, questions) is stored in chat_messages. 
+    # Messages are linked to chat_id and categorized by sender.
+    # 4. Handling Code Generation & Revisions
+    # The first AI-generated code is stored directly in code_revisions with revision_number = 1.
+    # Any further modifications or refinements by the user are stored as new revisions (revision_number increments).
+
+
     prompt = request.json.get('prompt')
     print('prompt: ', prompt)
-    # response = requests.post(
-    #     'https://dashscope-intl.aliyuncs.com/api/v1/services/aigc/text-generation/generation',
-    #     headers={'Authorization': f'Bearer {os.getenv("QWEN_API_KEY")}'},
-    #     json={
-    #         "model": "qwen-max",
-    #         "input": {
-    #             "messages": [{
-    #                 "role": "user",
-    #                 "content": f"Generate complete code with instructions. User request: {prompt}\n\nFORMAT:\nCODE:\n{{code}}\nINSTRUCTIONS:\n{{instructions}}"
-
-    #                 }]
-    #         }
-    #     }
-    # )
+    #lets create a new chat in DB
+    #if prompt length is more then 20 characters then we will get just the first 20 characters
+    db = get_db()
+    db.execute('INSERT INTO chats (user_id, title, status) VALUES (?, ?, ?)', (session['user_id'], prompt[:20], 'active'))
+    chat_id = db.execute('SELECT last_insert_rowid()').fetchone()[0]
+    db.commit()
+    
+    #new chat id
+    print('chat_id: ', chat_id)
+    #first we will enter user prompt in DB as a role user message
+    db = get_db()
+    db.execute('INSERT INTO chat_messages (chat_id, sender, message_type, content) VALUES (?, ?, ?, ?)', (chat_id, 'user', 'text', prompt))
+    db.commit()
+    
     starter_prompt = f"""
             Analyze the following user request and categorize it into one of the following types:
 
@@ -244,7 +256,6 @@ def generate_code():
 
             Make sure the category is accurate. If it's unclear, ask clarifying questions instead of assuming.
             """
-    # print('starter_prompt: ', starter_prompt)
     response = requests.post(
         'https://dashscope-intl.aliyuncs.com/api/v1/services/aigc/text-generation/generation',
         headers={'Authorization': f'Bearer {os.getenv("QWEN_API_KEY")}'},
@@ -253,18 +264,7 @@ def generate_code():
                 "input": {
                     "messages": [{
                         "role": "user",
-                        "content": starter_prompt
-                        # "content": f"""
-                        # Analyze the user request carefully and classify it into one of the following categories:
-                        # 1. **Generate Code Project** – If the request is about coding, software development, or creating a full project.
-                        # 2. **Generate Documentation** – If the user wants explanations, technical documentation, or API docs.
-                        # 3. **Generate Presentation Slides** – If the user is asking for a structured explanation in a slide format.
-                        # 4. **General AI Assistance** – If the request doesn't fall into the above, classify it as general AI assistance.
-                        
-                        # **User Request:** {prompt}
-                        
-                        # Respond ONLY with the category name from the above list without any additional text.
-                        # """
+                        "content": starter_prompt                      
                     }]
                 }
             }
@@ -276,19 +276,42 @@ def generate_code():
     print('category: ', category)
     if category == "Software Development":
         specific_prompt = specific_prompt = f"""
-            You are an expert software architect. Given the following user request, generate a complete project structure, including necessary files and instructions.
+            You are an advanced AI assistant and a highly skilled software architect. Your primary task is to generate complete, structured coding projects based on user requests. You must ensure the project includes all necessary files, dependencies, and instructions, following industry best practices.
+            <project_requirements>
+            - Generate a **fully functional coding project** based on the user's request.
+            - AI should **dynamically determine** the required files and folder structure—DO NOT hardcode specific file names unless required by a framework.
+            - Use **best practices** in software development to ensure modularity, maintainability, and efficiency.
+            - Provide **clear and structured project setup instructions** for users to run the project easily.
+            </project_requirements>
+
+            <response_format>
+            Return your response **strictly** in the following JSON format for easy frontend rendering:
+            {{ "project_name": "<Auto-generated project name based on the request>", "description": "<Brief explanation of what the project does>", "tech_stack": "<Identified technologies (e.g., Python Flask, React, Node.js, etc.)>", "files": [ {{ "path": "<File path determined dynamically>", "content": "<Full file content>" }} ], "instructions": {{ "setup": "<Step-by-step setup guide>", "run": "<How to execute the project>", "config": "<Additional configuration details, if any>" }} }}
+
+            - Ensure **each file is included** with its complete content.
+            - Provide a **well-structured file hierarchy** for modular development.
+            - **Do not summarize or truncate** file contents—always return the **full** content of each file.
+            </response_format>
+
+            <best_practices>
+            - Follow **industry standards** for writing clean, maintainable, and efficient code.
+            - If a framework is required (e.g., Django, Next.js), ensure the necessary dependencies are installed.
+            - For backend projects, provide an API structure with proper routing, authentication, and data handling.
+            - For frontend projects, include **component-based architecture** for scalability.
+            - For full-stack projects, structure the **frontend, backend, and database layers properly**.
+            - Always include a **README.md** file with detailed documentation.
+            - Ensure **all dependencies are listed** in the appropriate package manager file (e.g., `package.json`, `requirements.txt`).
+            </best_practices>
+
+            <project_scope_handling>
+            - If the user request is **too vague**, ask clarifying questions before generating the project.
+            - If additional context is needed, intelligently infer based on common best practices.
+            - If multiple valid approaches exist, choose the **most commonly accepted** approach.
+            </project_scope_handling>
+
+            CRITICAL: **Return the response strictly in valid JSON format without any additional text.** Do not explain anything outside the JSON response.
 
             **User Request:** {prompt}
-
-            **Output Format (Ensure JSON format for frontend parsing):**
-            {{ "project_name": "<AI-determined based on request>", "description": "<Short description of what the project does>", "tech_stack": "<Identified technologies (e.g., Python Flask, React, Node.js, etc.)>", "files": [ {{ "path": "<File path (AI decides required structure)>", "content": "<Code content>" }} ], "instructions": {{ "setup": "<How to set up the project>", "run": "<How to run the project>", "config": "<Any necessary configuration details>" }} }}
-
-            - AI must determine the required files based on best practices.
-            - Ensure modularity, scalability, and maintainability.
-            - If a framework is needed (e.g., Django for backend), configure dependencies.
-            - Avoid unnecessary files and keep the response **minimal yet complete**.
-
-            Generate the response in **valid JSON format**.
             """
     elif category == "Machine Learning / Data Science":
         specific_prompt = specific_prompt = f"""
@@ -297,12 +320,13 @@ def generate_code():
             **User Request:** {prompt}
 
             **Output Format (Ensure JSON format for frontend parsing):**
-            {{ "project_name": "<AI-determined name>", "description": "<Brief description of the ML task>", "tech_stack": "<Identified technologies (e.g., TensorFlow, PyTorch, Scikit-learn, etc.)>", "files": [ {{ "path": "data/dataset.csv", "content": "<If dataset needs to be generated, describe the format>" }} ], "instructions": {{ "data_prep": "<How to prepare datasets>", "training": "<How to train the model>", "evaluation": "<How to evaluate performance>", "deployment": "<How to deploy the model>" }} }}
+            {{ "project_name": "<AI-determined name>", "description": "<Brief description of the ML task>", "tech_stack": "<Identified technologies (e.g., TensorFlow, PyTorch, Scikit-learn, etc.)>", "files": [ {{ "path": "data/dataset.csv", "content": "<If dataset needs to be generated, describe the format>", "tech_stack": "<Technologies/frameworks used in this specific file>" }} ], "instructions": {{ "data_prep": "<How to prepare datasets>", "training": "<How to train the model>", "evaluation": "<How to evaluate performance>", "deployment": "<How to deploy the model>" }} }}
 
             Ensure:
             - Datasets are included or referenced.
             - The project follows industry best practices.
             - Scripts are modular and reusable.
+            - Each file specifies its tech stack and dependencies.
 
             Generate the response in **valid JSON format**.
             """
@@ -407,43 +431,57 @@ def generate_code():
     project_name = project_details.get('project_name')
     description = project_details.get('description')
     tech_stack = project_details.get('tech_stack')
-    files = project_details.get('files')
+    code = project_details.get('files')
     instructions = project_details.get('instructions')
     
-    
+    role= 'assistant'
+    message_type= 'text'
     print('project_name: ', project_name)
+    print('instructions: ', instructions)
     print('description: ', description)
     print('tech_stack: ', tech_stack)
-    print('files: ', files)
-    print('instructions: ', instructions)
-
-
+    print('code: ', code)
     
-    #clear session for user prompt
-    # session.pop('user_prompt', None)
-        
-    # full_text = response.json()['output']['text']
-    # code = full_text.split("CODE:")[1].split("INSTRUCTIONS:")[0].strip()
-    # instructions = full_text.split("INSTRUCTIONS:")[1].strip()
-    # print("session['session_id']: ", session['session_id'])
-    # db = get_db()
-    # db.execute('UPDATE sessions SET current_code = ?, instructions = ? WHERE session_id = ?',
-    #     (code, instructions, session['session_id']))
-    # db.commit()
+    #saving in DB
+    db = get_db()
+    db.execute('INSERT INTO chat_messages (chat_id, sender, message_type, content) VALUES (?, ?, ?, ?)', (chat_id, role, message_type, description))
+    chat_message_id = db.execute('SELECT last_insert_rowid()').fetchone()[0]
+    db.commit()
+    
+    ## colums for code_revisions table
+    # chat_message_id
+    # revision_number
+    # code_content
+    # tech_stack
+    # instructions
+    
+    # Convert code list and other complex objects to JSON strings before saving
+    code_json = json.dumps(code) if code else None
+    tech_stack_json = json.dumps(tech_stack) if tech_stack else None
+    instructions_json = json.dumps(instructions) if instructions else None
+    
+    #now we will save the code in code_revisions table
+    db.execute('INSERT INTO code_revisions (chat_id,chat_message_id, revision_number, code_content, tech_stack, instructions, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)', 
+              (chat_id, chat_message_id, 1, code_json, tech_stack_json, instructions_json, datetime.now()))
+    db.commit()
 
-    # if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-    #     return jsonify({
-    #             'code': clean_code_response(code),
-    #             'instructions': instructions
-    #     })
-            
-    # return redirect(url_for('result'),prompt=prompt, code=code, instructions=instructions)
-    # return jsonify({'code': code, 'instructions': instructions, 'prompt': prompt})
-    return jsonify({'category': category})
-    # except Exception as e:
-    #     if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-    #         return jsonify({'error': str(e)}), 500
-    #     raise e
+    return jsonify({
+        'code': code,
+        'instructions': instructions,
+        'prompt': prompt,
+        'project_name': project_name,
+        'description': description,
+        'tech_stack': tech_stack,
+        'chat_message_id': chat_message_id,
+        'chat_id': chat_id,
+        'session_id': session['session_id'],
+        'user_id': session['user_id'],
+        'category': category,
+        'project_details': project_details,
+        'revision_number': 1,
+        'error': None
+    }, 200)
+
 
 def clean_code_response(response: str) -> str:
     """
@@ -475,17 +513,39 @@ def get_sessions():
     
     return render_template('_sessions.html', sessions=sessions)
 
-@app.route('/result')
-def result():
-    current_session = get_current_session()
-    print('current_session: ', current_session)
-    if not current_session:
-        return redirect(url_for('home'))
-    # return render_template('result.html')
+@app.route('/result/<chat_id>')
+def result(chat_id):
+    # current_session = get_current_session()
+    # print('current_session: ', current_session)
+    # if not current_session:
+    #     return redirect(url_for('home'))
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    ##
+    # we need to get user chat messages of the current chat used by the chat id in parameter
+    #current chat 
+    db = get_db()
+    current_chat = db.execute(
+        'SELECT * FROM chats WHERE id = ?',
+        (chat_id,)
+    ).fetchone()
+    # also all its revisions of the codes #
+    chat_messages = db.execute(
+        'SELECT * FROM chat_messages WHERE chat_id = ?',
+        (chat_id,)
+    ).fetchall()
+    
+    #get all revisions of the codes
+    code_revisions = db.execute(
+        'SELECT * FROM code_revisions WHERE chat_id = ? ORDER BY revision_number DESC LIMIT 1',
+        (chat_id,)
+    ).fetchone()
+    print('Code Revision: ', code_revisions)
     return render_template('result.html',
-        code=current_session['current_code'],
-        instructions=current_session['instructions'],
-        sessions=current_session
+        chat_messages=chat_messages,
+        code_revisions=code_revisions,
+        sessions=session,
+        current_chat=current_chat
     )
     
     
