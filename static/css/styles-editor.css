@@ -85,7 +85,7 @@ body {
 }
 
 .file-item {
-    display: flex;
+    /* display: flex; */
     align-items: center;
     padding: 0.25rem 0;
     color: #6c757d;
