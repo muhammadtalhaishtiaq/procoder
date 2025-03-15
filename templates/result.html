@@ -11,70 +11,6 @@
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <!-- Custom CSS -->
     <link href="/static/css/styles-editor.css" rel="stylesheet">
-
-    <style>
-        /* body {
-            margin: 0;
-            padding: 20px;
-            font-family: monospace;
-            display: flex;
-            background-color: #1e1e1e;
-            color: #d4d4d4;
-        } */
-        
-        .explorer {
-            width: 300px;
-            margin-right: 20px;
-            overflow-y: auto;
-        }
-        
-        .file-tree {
-            list-style: none;
-            padding-left: 15px;
-        }
-        
-        .file-item {
-            cursor: pointer;
-            padding: 5px;
-            user-select: none;
-        }
-        
-        .file-item:hover {
-            background-color: #2a2d2e;
-        }
-        
-        .folder::before {
-            content: '📁 ';
-        }
-        
-        .file::before {
-            content: '📄 ';
-        }
-        
-        .collapsed .children {
-            display: none;
-        }
-        
-        .collapsed::before {
-            content: '📂 ';
-        }
-        
-        .content-view {
-            /* flex: 1; */
-            /* background-color: #252526; */
-            /* padding: 20px; */
-            /* overflow-x: auto; */
-        }
-        
-        pre {
-            white-space: pre-wrap;
-            margin: 0;
-        }
-        
-        .selected {
-            background-color: #37373d;
-        }
-    </style>
 </head>
 
 <body class="bg-dark">
@@ -94,8 +30,8 @@
                         <!-- <i class="material-icons ms-2">arrow_drop_down</i> -->
                     </button>
                     <ul class="dropdown-menu dropdown-menu-dark">
-                        <li><a class="dropdown-item" href="#">New Project</a></li>
-                        <li><a class="dropdown-item" href="#">Open Project</a></li>
+                        <li><a class="dropdown-item" href="/">New Project</a></li>
+                        <!-- <li><a class="dropdown-item" href="#">Open Project</a></li> -->
                     </ul>
                 </div>
             </div>
@@ -132,23 +68,6 @@
                 </div>
             </div>
             <div class="chat-messages p-3">
-                <!-- <div class="message">
-                    <p class="text-white mb-2">I'll help you create a complete UI for ProCoder using plain HTML, Bootstrap, and JavaScript.</p>
-                </div>
-                <div class="task-list">
-                    <div class="task completed">
-                        <i class="material-icons text-success">check_circle</i>
-                        <span>Create initial files</span>
-                    </div>
-                    <div class="task completed">
-                        <i class="material-icons text-success">check_circle</i>
-                        <span>Update package.json</span>
-                    </div>
-                    <div class="task in-progress">
-                        <i class="material-icons text-primary">refresh</i>
-                        <span>Install dependencies</span>
-                    </div>
-                </div> -->
                 {% for chat_message in chat_messages %}
                 <div class="message" data-sender="{{chat_message.sender}}">
                     {% if chat_message.sender == 'user' %}
@@ -177,44 +96,28 @@
         <div class="editor-container flex-grow-1">
             <div class="d-flex h-100">
                 <!-- File Explorer -->
-                <div class="file-explorer bg-darker">
+                <div class="file-explorer bg-darker" style="font-size: 13px;">
                     <div class="p-3">
                         <div class="d-flex align-items-center mb-3">
                             <i class="material-icons text-secondary me-2">folder</i>
-                            <span class="text-white">Structure</span>
+                            <span class="text-white">Architecture</span>
                         </div>
                         <div class="file-tree">
-                            <!--   Sample file structure in JSOn -->
-                            <!--Directory structure-->
-
                             <div class="explorer" id="explorer"></div>
-
                         </div>
                     </div>
                 </div>
 
                 <!-- Code Editor -->
-                <div class="code-editor flex-grow-1" style="background-color: #1a1a1a;">
+                <div class="flex-grow-1" style="background-color: #1a1a1a;">
                     <div class="editor-tabs d-flex bg-darker">
                         <div class="tab active">
-                            <span>styles.css</span>
-                            <i class="material-icons">close</i>
+                            <span id="file_name"></span>
+                            <!-- <i class="material-icons">close</i> -->
                         </div>
                     </div>
-                    <div class="editor-content">
-                        <pre class="text-white p-3">
-                            <code>
-                                <div class="content-view" id="content"></div>
-                            </code>
-<!-- <code>/* Global Styles */
-body {
-    background-color: #0a0a0a;
-    color: #f8f9fa;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-
-/* Add your styles here */</code> -->
-                        </pre>
+                    <div class="editor-content" style="color: white;">
+                        <div class="content-view" id="content"></div>
                     </div>
                 </div>
             </div>
@@ -243,48 +146,20 @@ body {
     <!-- Custom JavaScript -->
     <script src="/static/js/script-editor.js"></script>
 
-    <style>
-        .message {
-            /* display: flex; */
-            margin-bottom: 1rem;
-            width: 100%;
-        }
-        
-        .message[data-sender="user"] {
-            justify-content: flex-end;
-        }
-        
-        .message[data-sender="assistant"] {
-            justify-content: flex-start;
-        }
-        
-        .message-content {
-            max-width: 70%;
-            padding: 0.75rem 1rem;
-            border-radius: 1rem;
-            word-wrap: break-word;
-        }
-        
-        .user-message {
-            background-color: #2563eb;
-            margin-left: auto;
-            border-bottom-right-radius: 0.25rem;
-        }
-        
-        .assistant-message {
-            background-color: #374151;
-            margin-right: auto;
-            border-bottom-left-radius: 0.25rem;
-        }
-        
-        .chat-messages {
-            overflow-y: auto;
-            max-height: calc(100vh - 200px);
-            padding: 1rem;
-        }
-    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- Highlight codes -->
+    <!-- Include highlight.js CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+
+    <!-- Include highlight.js JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+
 
     <script>
+        document.addEventListener('DOMContentLoaded', (event) => {
+            hljs.highlightAll();
+        });
         document.addEventListener('DOMContentLoaded', function() {
             const messages = document.querySelectorAll('.message');
             messages.forEach(message => {
@@ -301,10 +176,10 @@ body {
         let current_url_parts = current_url.split('/');
         let current_url_parts_last = current_url_parts[current_url_parts.length - 1];
 
-        //current_url_parts_last is the id of the project
+        // current_url_parts_last is the id of the project
         let project_id = current_url_parts_last;
 
-        //get the project details from the database
+        // get the project details from the database
         let files = [];
         fetch(`/api/projects/${project_id}`, {
                 method: 'GET',
@@ -323,19 +198,10 @@ body {
 
                 files = code_content;
                 initExplorer(files);
-
-
             })
             .catch(error => {
                 console.log('error: ', error);
             });
-
-        // const files = JSON.parse({
-        //     {
-        //         code_revisions.code_content
-        //     }
-        // });
-        // console.log(files);
 
         // Sample data - replace this with your dynamic data from Python
 
@@ -363,6 +229,83 @@ body {
             return root;
         }
 
+        // function createTreeElement(item, depth = 0) {
+        //     console.log('item in createTreeElement: ', item);
+        //     const div = document.createElement('div');
+        //     div.className = `file-item ${item.type}${item.type === 'folder' ? ' collapsed' : ''}`;
+        //     div.textContent = item.name;
+        //     div.style.paddingLeft = `${depth * 15}px`;
+
+        //     if (item.type === 'folder') {
+        //         const childrenDiv = document.createElement('div');
+        //         childrenDiv.className = 'children';
+        //         Object.values(item.children).forEach(child => {
+        //             childrenDiv.appendChild(createTreeElement(child, depth + 1));
+        //         });
+        //         div.appendChild(childrenDiv);
+
+        //         div.addEventListener('click', function(e) {
+        //             e.stopPropagation();
+        //             this.classList.toggle('collapsed');
+        //         });
+        //     } else {
+        //         div.addEventListener('click', function() {
+        //             console.log('item in div.addEventListener: ', item);
+        //             document.querySelectorAll('.file-item').forEach(el => el.classList.remove('selected'));
+        //             this.classList.add('selected');
+
+        //             // Clear previous content
+        //             const contentDiv = document.getElementById('content');
+        //             contentDiv.innerHTML = '';
+
+        //             // Create a pre and code block for highlighting
+        //             const pre = document.createElement('pre');
+        //             const code = document.createElement('code');
+        //             code.className = getLanguageClass(item.name); // Determine language based on file extension
+        //             code.textContent = item.content;
+        //             pre.appendChild(code);
+        //             contentDiv.appendChild(pre);
+
+        //             // Highlight the code
+        //             hljs.highlightElement(code);
+        //         });
+        //     }
+
+        //     return div;
+        // }
+
+        // function getLanguageClass(fileName) {
+        //     const extension = fileName.split('.').pop().toLowerCase();
+        //     switch (extension) {
+        //         case 'js':
+        //             return 'javascript';
+        //         case 'html':
+        //             return 'html';
+        //         case 'css':
+        //             return 'css';
+        //         case 'py':
+        //             return 'python';
+        //         case 'java':
+        //             return 'java';
+        //         case 'c':
+        //             return 'c';
+        //         case 'cpp':
+        //             return 'cpp';
+        //         case 'php':
+        //             return 'php';
+        //         case 'rb':
+        //             return 'ruby';
+        //         case 'swift':
+        //             return 'swift';
+        //         case 'go':
+        //             return 'go';
+        //         case 'ts':
+        //             return 'typescript';
+        //         default:
+        //             return '';
+        //     }
+        // }
+
         function createTreeElement(item, depth = 0) {
             console.log('item in createTreeElement: ', item);
             const div = document.createElement('div');
@@ -387,12 +330,107 @@ body {
                     console.log('item in div.addEventListener: ', item);
                     document.querySelectorAll('.file-item').forEach(el => el.classList.remove('selected'));
                     this.classList.add('selected');
-                    document.getElementById('content').innerHTML =
-                        `<pre>${escapeHtml(item.content)}</pre>`;
+
+                    // Clear previous content
+                    const contentDiv = document.getElementById('content');
+                    contentDiv.innerHTML = '';
+
+                    // Ensure marked is available
+                    // waitForMarked(() => {
+                    // Determine if the file is Markdown
+                    if (item.name.toLowerCase().endsWith('.md')) {
+                        // Convert Markdown to HTML
+                        const htmlContent = formatText(item.content);
+                        contentDiv.innerHTML = htmlContent;
+                        $('#file_name').html(item.name);
+                    } else {
+                        // Create a pre and code block for highlighting
+                        const pre = document.createElement('pre');
+                        const code = document.createElement('code');
+                        code.className = getLanguageClass(item.name); // Determine language based on file extension
+                        code.textContent = item.content;
+                        pre.appendChild(code);
+                        contentDiv.appendChild(pre);
+
+                        $('#file_name').html(item.name);
+
+                        // Highlight the code
+                        hljs.highlightElement(code);
+                    }
+                    // });
                 });
             }
 
             return div;
+        }
+
+        function waitForMarked(callback) {
+            if (typeof marked === 'function') {
+                callback();
+            } else {
+                setTimeout(() => waitForMarked(callback), 100); // Retry after 100ms
+            }
+        }
+
+        function getLanguageClass(fileName) {
+            const extension = fileName.split('.').pop().toLowerCase();
+            switch (extension) {
+                case 'js':
+                    return 'javascript';
+                case 'html':
+                    return 'html';
+                case 'css':
+                    return 'css';
+                case 'py':
+                    return 'python';
+                case 'java':
+                    return 'java';
+                case 'c':
+                    return 'c';
+                case 'cpp':
+                    return 'cpp';
+                case 'php':
+                    return 'php';
+                case 'rb':
+                    return 'ruby';
+                case 'swift':
+                    return 'swift';
+                case 'go':
+                    return 'go';
+                case 'ts':
+                    return 'typescript';
+                case 'md':
+                    return 'markdown';
+                default:
+                    return '';
+            }
+        }
+
+        function formatText(text) {
+            // Convert headers
+            let formatted = text
+                .replace(/^#{1}\s(.*)/gm, '<h4>$1</h4>')
+                .replace(/^#{2}\s(.*)/gm, '<h5>$1</h5>')
+                .replace(/^#{3}\s(.*)/gm, '<h6>$1</h6>')
+
+            // Convert bullet points
+            formatted = formatted.replace(/^- (.*)/gm, '<li>$1</li>')
+                // formatted = formatted.replace(/(<li>.*<\/li>)+/gm, '<ul>$&</ul>')
+
+            // Convert numbered lists
+            formatted = formatted.replace(/^(\d+\.\s.*)/gm, '<li>$1</li>')
+                // formatted = formatted.replace(/(<li>.*<\/li>)+/gm, '<ol>$&</ol>')
+
+            // Convert code blocks
+            formatted = formatted.replace(/`(.+?)`/gm, '<code>$1</code>')
+
+            // Convert line breaks
+            formatted = formatted.replace(/\n/gm, '<br>')
+
+            // Clean up multiple <br> tags
+            formatted = formatted.replace(/<br>/gm, '<p></p>')
+
+            return formatted
         }
 
         function escapeHtml(unsafe) {
@@ -412,9 +450,6 @@ body {
                 explorer.appendChild(createTreeElement(item));
             });
         }
-
-        // Initialize when loaded
-        // window.onload = initExplorer;
     </script>
 </body>
 

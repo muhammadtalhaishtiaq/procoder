@@ -5,10 +5,8 @@ import uuid
 import requests
 from werkzeug.security import generate_password_hash, check_password_hash
 from dotenv import load_dotenv
-from datetime import datetime
 import json
-import re
-
+from datetime import datetime
 load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.getenv('SECRET_KEY')
@@ -229,7 +227,7 @@ def generate_code():
     #lets create a new chat in DB
     #if prompt length is more then 20 characters then we will get just the first 20 characters
     db = get_db()
-    db.execute('INSERT INTO chats (user_id, title, status) VALUES (?, ?, ?)', (session['user_id'], prompt, 'active'))
+    db.execute('INSERT INTO chats (user_id, title, status) VALUES (?, ?, ?)', (session['user_id'], prompt[:20], 'active'))
     chat_id = db.execute('SELECT last_insert_rowid()').fetchone()[0]
     db.commit()
     
@@ -243,7 +241,7 @@ def generate_code():
     starter_prompt = f"""
             Analyze the following user request and categorize it into one of the following types:
 
-            1. **Software Development**: Generate a basic code in any language(c++/python/java/php/nodejs or any other programming or scripting langauge)or Generate a complete code project with files, modules, and dependencies.
+            1. **Software Development**: Generate a basic code or Generate a complete code project with files, modules, and dependencies.
             2. **Machine Learning / Data Science**: Create an ML project with datasets, models, training scripts, and evaluation.
             3. **Automation / Scripting**: Generate automation scripts such as web scraping, data processing, or workflow automation.
             4. **DevOps / Infrastructure**: Generate deployment configurations, CI/CD pipelines, or containerization scripts.
@@ -260,9 +258,9 @@ def generate_code():
             """
     response = requests.post(
         'https://dashscope-intl.aliyuncs.com/api/v1/services/aigc/text-generation/generation',
-        headers={'Authorization': f'Bearer {os.getenv("API_KEY")}'},
+        headers={'Authorization': f'Bearer {os.getenv("QWEN_API_KEY")}'},
             json={
-                "model": os.getenv("MODEL"),
+                "model": "qwen-max",
                 "input": {
                     "messages": [{
                         "role": "user",
@@ -310,7 +308,7 @@ def generate_code():
             "tech_stack": "<Identified technologies (e.g., Python Flask, React, Node.js, etc.)>", 
             "files": [ 
                 {{ 
-                    "path": "<File path determined dynamically>",
+                    "path": "<File path determined dynamically>", // Use forward slashes to indicate directories and subdirectories
                     "content": "<Full file content>" 
                 }} 
             ], 
@@ -337,7 +335,6 @@ def generate_code():
             - For full-stack projects, structure the **frontend, backend, and database layers properly**.
             - Always include a **README.md** file with detailed documentation.
             - Ensure **all dependencies are listed** in the appropriate package manager file (e.g., `package.json`, `requirements.txt`).
-            - Use forward slashes to indicate directories and subdirectories.
                 <coding_standards>
                     - ALWAYS create smaller, atomic components and modules
                     - Modularity is PARAMOUNT - Break down functionality into logical, reusable parts
@@ -353,7 +350,7 @@ def generate_code():
             
 
             CRITICAL: **Return the response strictly in valid JSON format without any additional text. Do not explain anything outside the JSON response. These rules are ABSOLUTE and MUST be followed WITHOUT EXCEPTION in EVERY response. The output is a complete, production-ready project. 
-            File paths clearly indicate the directory structure. Don't add any hallucinated code, be on project context from start to finish everytime**
+            File paths clearly indicate the directory structure. **
 
 
             **User Request:** {prompt}
@@ -457,9 +454,9 @@ def generate_code():
     # Now send the actual API request based on the classification
     final_response = requests.post(
         'https://dashscope-intl.aliyuncs.com/api/v1/services/aigc/text-generation/generation',
-        headers={'Authorization': f'Bearer {os.getenv("API_KEY")}'},
+        headers={'Authorization': f'Bearer {os.getenv("QWEN_API_KEY")}'},
         json={
-            "model": os.getenv("MODEL"),
+            "model": "qwen-max",
             "input": {
                 "messages": [{
                     "role": "user",
@@ -471,30 +468,13 @@ def generate_code():
     # print('final_response: ', final_response.json())
     
     data = final_response.json()  # Convert response to JSON
-    print('Main response output: ', data['output']);
-    project_details = data['output']['text']
-    project_details = json.loads(project_details)
-    # print('Project Details: ', text_data['project_name']);
-
-
-    # project_details = json.loads(data['output']['text'].strip('```json\n'))
-    # # Extract the JSON string from the response
-    # json_string = data['output']['text']
-    # print('JSON_ RESPONSE:', json_string);
-
-    # # Preprocess the JSON string to replace invalid escape sequences
-    # project_details = re.sub(r'\\(?![/bfnrt\\"])', r'\\\\', json_string)
-    # print('JSON_ project_details:', project_details);
+    project_details = json.loads(data['output']['text'].strip('```json\n'))
     
-    # project_details = project_details.strip('```json\n')
-    # print(project_details);
-    
-    
-    project_name = project_details['project_name']
-    description = project_details['description']
-    tech_stack = project_details['tech_stack']
-    code = project_details['files']
-    instructions = project_details['instructions']
+    project_name = project_details.get('project_name')
+    description = project_details.get('description')
+    tech_stack = project_details.get('tech_stack')
+    code = project_details.get('files')
+    instructions = project_details.get('instructions')
     
     role= 'assistant'
     message_type= 'text'

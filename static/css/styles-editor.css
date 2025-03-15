@@ -139,7 +139,7 @@ body {
 
 .editor-content {
     flex-grow: 1;
-    background-color: #1a1a1a;
+    /* background-color: #252526; */
     overflow-y: auto;
 }
 
@@ -228,4 +228,143 @@ body {
 
 .dropdown-item:hover {
     background-color: #333;
+}
+
+
+/* Content window */
+
+.editor-content {
+    flex-grow: 1;
+    /* background-color: #1a1a1a; */
+    background-color: #252526 !important;
+    overflow: auto;
+    /* Enable scrolling in both directions */
+    height: 500px;
+    /* Fixed height */
+    width: 100%;
+    /* Full width of the parent container */
+}
+
+@media (max-width: 1200px) {
+    .editor-content {
+        height: 450px;
+        /* Adjust height for smaller screens */
+    }
+}
+
+@media (max-width: 992px) {
+    .editor-content {
+        height: 400px;
+        /* Further adjust height for even smaller screens */
+    }
+}
+
+@media (max-width: 768px) {
+    .editor-content {
+        height: 350px;
+        /* Adjust height for mobile devices */
+    }
+}
+
+
+/* Messaging CSS */
+
+.message {
+    /* display: flex; */
+    margin-bottom: 1rem;
+    width: 100%;
+}
+
+.message[data-sender="user"] {
+    justify-content: flex-end;
+}
+
+.message[data-sender="assistant"] {
+    justify-content: flex-start;
+}
+
+.message-content {
+    max-width: 70%;
+    padding: 0.75rem 1rem;
+    border-radius: 1rem;
+    word-wrap: break-word;
+}
+
+.user-message {
+    background-color: #2563eb;
+    margin-left: auto;
+    border-bottom-right-radius: 0.25rem;
+}
+
+.assistant-message {
+    background-color: #374151;
+    margin-right: auto;
+    border-bottom-left-radius: 0.25rem;
+}
+
+.chat-messages {
+    overflow-y: auto;
+    max-height: calc(100vh - 200px);
+    padding: 1rem;
+}
+
+.explorer {
+    width: 300px;
+    margin-right: 20px;
+    overflow-y: auto;
+}
+
+.file-tree {
+    list-style: none;
+    padding-left: 15px;
+}
+
+.file-item {
+    cursor: pointer;
+    padding: 5px;
+    user-select: none;
+}
+
+.file-item:hover {
+    background-color: #2a2d2e;
+}
+
+.folder::before {
+    content: '📁 ';
+}
+
+.file::before {
+    content: '📄 ';
+}
+
+.collapsed .children {
+    display: none;
+}
+
+.collapsed::before {
+    content: '📂 ';
+}
+
+.content-view {
+    padding-top: 2%;
+    padding-left: 2%;
+    /* flex: 1; */
+    background-color: #252526;
+    /* padding: 20px; */
+    overflow-x: auto;
+}
+
+pre {
+    white-space: pre-wrap;
+    margin: 0;
+    color: white !important;
+}
+
+.selected {
+    background-color: #37373d;
+}
+
+code {
+    /* background: #000000 !important; */
+    /* color: white !important; */
 }
